@@ -18,7 +18,6 @@ impl Block {
         timestamp: u128,
         prev_block_hash: BlockHash,
         nonce: u64,
-        hash: BlockHash,
         payload: String,
         difficulty: u128,
     ) -> Self {
@@ -26,7 +25,7 @@ impl Block {
             index,
             timestamp,
             prev_block_hash,
-            hash,
+            hash: vec![0; 32],
             nonce,
             payload,
             difficulty,
@@ -64,10 +63,11 @@ impl Debug for Block {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "Block[{}]: {} at {}",
+            "Block[{}]: {} at {} nonce: {}",
             &self.index,
             &hex::encode(&self.hash),
-            &self.timestamp
+            &self.timestamp,
+            &self.nonce,
         )
     }
 }
