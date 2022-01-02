@@ -1,41 +1,69 @@
 use blockchainlib::*;
 fn main() {
     let difficulty = 0x000fffffffffffffffffffffffffffff;
+    let mut genesis_block = Block::new(
+        0,
+        now(),
+        vec![0; 32],
+        0,
+        vec![Transaction {
+            inputs: vec![],
+            outputs: vec![
+                transaction::Output {
+                    to_addr: "Alice".to_owned(),
+                    value: 50,
+                },
+                transaction::Output {
+                    to_addr: "Bob".to_owned(),
+                    value: 7,
+                },
+            ],
+        }],
+        difficulty,
+    );
+
+    genesis_block.mine();
+    println!("{:?}", genesis_block);
+    let mut last_hash = genesis_block.hash.clone();
+
+    let mut blockchain = Blockchain::new();
+    blockchain
+        .update_with_block(genesis_block)
+        .expect("Genesis block failed");
+
     let mut block = Block::new(
         0,
         now(),
         vec![0; 32],
-        118318,
-        "Genesis Block".to_owned(),
+        0,
+        vec![
+            Transaction {
+                inputs: vec![],
+                outputs: vec![transaction::Output {
+                    to_addr: "Chris".to_owned(),
+                    value: 536,
+                }],
+            },
+            Transaction {
+                inputs: vec![blockchain.blocks[0].transactions[0].outputs[0].clone()],
+                outputs: vec![
+                    transaction::Output {
+                        to_addr: "Alice".to_owned(),
+                        value: 360,
+                    },
+                    transaction::Output {
+                        to_addr: "Bob".to_owned(),
+                        value: 12,
+                    },
+                ],
+            },
+        ],
         difficulty,
     );
 
     block.mine();
-    println!("Genesis block: {:?}", &block);
+    println!("{:?}", block);
+    last_hash = block.hash.clone();
 
-    let mut last_hash = block.hash.clone();
-
-    let mut blockchain = Blockchain {
-        blocks: vec![block],
-    };
-
-    println!("Verify: {}", &blockchain.verify());
-
-    for i in 1..=10 {
-        let mut block = Block::new(
-            i,
-            now(),
-            last_hash,
-            0,
-            "Another block".to_owned(),
-            difficulty,
-        );
-        block.hash = block.hash();
-        block.mine();
-        println!("Mined block: {:?}", &block);
-
-        last_hash = block.hash.clone();
-        blockchain.blocks.push(block);
-    }
-    println!("Verify: {}", &blockchain.verify());
+    blockchain.update_with_block(block).expect("block failed");
 }

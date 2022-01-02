@@ -1,4 +1,5 @@
-pub type BlockHash = Vec<u8>;
+pub type Hash = Vec<u8>;
+pub type Address = String;
 
 use std::convert::TryInto;
 use std::time::SystemTime;
@@ -27,7 +28,9 @@ pub fn difficulty_as_bytes_u128(v: &Vec<u8>) -> u128 {
 mod block;
 
 pub use crate::block::Block;
-mod hashable;
+pub mod hashable;
 pub use crate::hashable::Hashable;
-mod blockchain;
-pub use crate::blockchain::*;
+pub mod blockchain;
+pub use crate::blockchain::Blockchain;
+pub mod transaction;
+pub use crate::transaction::Transaction;
